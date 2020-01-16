@@ -3,31 +3,12 @@
 # "DATASHEET": http://cl.ly/ekot
 # https://gist.github.com/kadamski/92653913a53baf9dd1a8
 from sds011 import SDS011
-import serial, struct, sys, time, json, atexit
+import time, json
 import logging
 import os
 from os.path import exists
 from datetime import datetime
-
 from dateutil.tz import tzlocal
-
-# from pytz import timezone
-# import pytz
-# from tzlocal import get_localzone
-
-# tz = get_localzone()
-
-# DEBUG = 0
-# CMD_MODE = 2
-# CMD_QUERY_DATA = 4
-# CMD_DEVICE_ID = 5
-# CMD_SLEEP = 6
-# CMD_FIRMWARE = 7
-# CMD_WORKING_PERIOD = 8
-# MODE_ACTIVE = 0
-# MODE_QUERY = 1
-
-ser = serial.Serial()
 
 sleep_sec = 60 #frequency of measurements (60sec = 1 minute)
 read_sec = 15 # how many seconds to read for
@@ -46,12 +27,6 @@ json_path = '..\\html\\aqi.json'
 csv_path = "..\\html\\aqi.csv"
 
 
-# ser.open()
-# ser.flushInput()
-
-# byte, data = 0, ""
-
-
 def initiate_json(file_path):
     """
     Check to see if the aqi.json exists in the html directory and add it if not
@@ -61,7 +36,6 @@ def initiate_json(file_path):
             fresh_file.write('[]')
 
 if __name__ == '__main__':
-
 
     sensor = SDS011(port,baudrate=baudrate,use_query_mode=True)
     sensor.sleep()
@@ -77,7 +51,6 @@ if __name__ == '__main__':
     failure_tolerance = 3
 
     loop_forever = True
-    
     
     try:
         while loop_forever:
