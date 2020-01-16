@@ -54,10 +54,10 @@ Not Working and on the TODO list:
 * Install raspbian on the pi (this is better than NOOBS I believe because you can setup headless easier).
 * Optionally, configure the Pi to be headless by configuring wireless and enabling SSH  before inserting the SD Card into the Pi (https://www.raspberrypi.org/documentation/configuration/wireless/headless.md)
 * Boot the Pi and SSH in.
-* Depending on your raspbian image you may need to install git and other tools (python 2 and 3) first
+* Depending on your raspbian image you may need to install git and other tools (python 3) first
 ```
 sudo apt update
-sudo apt install git python-pip python3-pip
+sudo apt install git python3-pip
 ```
 * Clone this (or a forked copy) of this repo to your pi: 
 ```
@@ -69,10 +69,9 @@ cd aqi-pi
 * Copy the contents of the html directory into /var/www/html and install some python2 packages and a lightweight HTTP server
 ```
 sudo apt install lighttpd python-serial python-enum
-pip install pytz tzlocal
+pip install py-sds011
 sudo cp ./html/* /var/www/html
 ```
-TODO migrate python 2 scripts to python 3
 TODO setup requirements.txt to automatically collect python prerequisites
 
 ## OLED Display Setup
