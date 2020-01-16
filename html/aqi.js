@@ -3,10 +3,10 @@ function getData() {
     response.json().then(data => {
       //console.log(data);
       updateHtml(data[data.length-1]);
-    })
+    });
   }).catch(err => {
     console.log(err);
-  })
+  });
 }
 
 function updateHtml(data) {
@@ -24,36 +24,37 @@ function updateHtml(data) {
   colorsPm25 = getColor(aqiPm25);
   colorsPm10 = getColor(aqiPm10);
   document.getElementById("containerPm25").style.background = colorsPm25.bg;
-  document.getElementById("containerPm25").style.color = colorsPm25.text
+  document.getElementById("containerPm25").style.color = colorsPm25.text;
   document.getElementById("containerPm10").style.background = colorsPm10.bg;
-  document.getElementById("containerPm10").style.color = colorsPm10.text
+  document.getElementById("containerPm10").style.color = colorsPm10.text;
 }
 
 function getColor(aqi) {
   switch (true) {
     case (aqi >= 50 && aqi < 100):
-      color = "yellow";
+      color = "yellow"; // moderate
       break;
     case (aqi >= 100 && aqi < 150):
-      color = "orange";
+      color = "orange"; // unhealthy for sensitive groups
       break;
     case (aqi >= 150 && aqi < 200):
-      color = "red";
+      color = "red"; // Unhealthy
       break;
     case (aqi >= 200 && aqi < 300):
-      color = "purple";
+      color = "purple"; // Very Unhealthy
       break;
     case (aqi >= 300):
-      color = "brown";
+      color = "brown"; // Hazardous
       break;
     default:
-      color = "Lime";
+      color = "Lime"; // Good
   }
   return {bg: color, text: (aqi > 200) ? "white" : "black"};
 }
 
 function calcAQIpm25(pm25) {
-  let pm1 = 0;
+	/* EPA breakpoints for PM2.5 AQI */
+    let pm1 = 0;
 	let pm2 = 12;
 	let pm3 = 35.4;
 	let pm4 = 55.4;
@@ -92,6 +93,7 @@ function calcAQIpm25(pm25) {
 }
 
 function calcAQIpm10(pm10) {
+	/* EPA breakpoints for PM10 AQI */
 	let pm1 = 0;
 	let pm2 = 54;
 	let pm3 = 154;

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+<style type="text/css">
+/* 13. Basic Styling with CSS */
+
+/* Style the lines by removing the fill and applying a stroke */
+.line25 {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+.line10 {
+    fill: none;
+    stroke: #6d00fc;
+    stroke-width: 3;
+}
+  
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+/* Style the dots by assigning a fill and stroke */
+.dot25 {
+    fill: #ffab00;
+    stroke: #fff;
+}
+  
+.dot10 {
+    fill: #6d00fc;
+    stroke: #fff;
+}
+
+  .focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+ /* Make the chart container fill the page using CSS. */
+ #chart {
+        position: fixed;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+      }
+</style>
+<script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<!-- Body tag is where we will append our SVG and SVG objects-->
+<body>
+  <div id="chart"></div>
+
+
+<!-- Load in the d3 library -->
+
+<script>
+
+
+
+// 2. Use the margin convention practice 
+var width = 1000 //chartDiv.clientWidth - margin.left - margin.right // Use the window's width 
+  , height = 700; //chartDiv.clientHeight - margin.top - margin.bottom; // Use the window's height
+
+var margin = {top: 50, right: 50, bottom: 50, left: 50}
+var chartDiv = document.getElementById("chart");
+var svg = d3.select(chartDiv).append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height+margin.top + margin.bottom).append("g")
+   
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// ;
+
+
+var loadData = function(){
+  d3.json("aqi.json").then(function(data) {
+  
+    data.forEach(function(d){
+        d.date = new Date(d.time); //parseDate.parse(d.time);
+        console.log(d.date);
+    
+    });
+ 
+ 
+  // , width = window.innerWidth - margin.left - margin.right // Use the window's width 
+  // , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
+
+ 
+
+  
+// The number of datapoints
+var n =  data.length;
+
+// 5. X scale will use the index of our data
+var xScale = d3.scaleTime()
+    .domain(d3.extent(data, function(d) { return d.date; })) // input
+    .range([0, width]); // output
+
+// 6. Y scale will use the randomly generate number 
+var yScale = d3.scaleLinear()
+    .domain(d3.extent(
+       function(array, names){
+          var res = [];
+          array.forEach(function(item){
+             names.forEach(function(name){
+                res = res.concat(item[name]);
+             });
+          });
+          return(res);
+       }(data, ["pm25","pm10"]))) // input 
+    .range([height, 0]); // output 
+
+// 7. d3's line generator
+var line25 = d3.line()
+    .x(function(d) { return xScale(d.date); }) // set the x values for the line generator
+    .y(function(d) { return yScale(d.pm25); }); // set the y values for the line generator 
+    // .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+var line10 = d3.line()
+    .x(function(d) { return xScale(d.date); }) // set the x values for the line generator
+    .y(function(d) { return yScale(d.pm10); }); // set the y values for the line generator 
+    // .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
+// var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
+
+// 1. Add the SVG to the page and employ #2
+
+
+// if (svg.nodes.length == 0){
+//   svg = d3.select("body").append("svg").attr("id","mygraph");
+// }
+
+ 
+// 3. Call the x axis in a group tag
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
+
+// 4. Call the y axis in a group tag
+svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
+
+
+
+// 9. Append the path, bind the data, and call the line generator 
+
+// let update = svg.selectAll("path")
+//         .data(data)
+
+// update.enter().append("path")
+//     .datum(data) // 10. Binds data to the line 
+//     .attr("class", "line25") // Assign a class for styling 
+//     .attr("d", line25); // 11. Calls the line generator 
+    
+    
+//    update.enter().append("path")
+//     .datum(data) // 10. Binds data to the line 
+//     .attr("class", "line10") // Assign a class for styling 
+//     .attr("d", line10); // 11. Calls the line generator 
+
+//     update.exit().datum(data).remove();
+
+
+
+// 12. Appends a circle for each datapoint 
+svg.selectAll(".dot25")
+    .data(data)
+  .enter().append("circle") // Uses the enter().append() method
+    .attr("class", "dot25") // Assign a class for styling
+    .attr("cx", function(d) { return xScale(d.date) })
+    .attr("cy", function(d) { return yScale(d.pm25) })
+    .attr("r", 5)
+      .on("mouseover", function(a, b, c) { 
+  			console.log(a) 
+        // this.attr('class', 'focus')
+		})
+      .on("mouseout", function() {  })
+//       .on("mousemove", mousemove);
+
+//   var focus = svg.append("g")
+//       .attr("class", "focus")
+//       .style("display", "none");
+
+//   focus.append("circle")
+//       .attr("r", 4.5);
+
+//   focus.append("text")
+//       .attr("x", 9)
+//       .attr("dy", ".35em");
+
+//   svg.append("rect")
+//       .attr("class", "overlay")
+//       .attr("width", width)
+//       .attr("height", height)
+//       .on("mouseover", function() { focus.style("display", null); })
+//       .on("mouseout", function() { focus.style("display", "none"); })
+//       .on("mousemove", mousemove);
+  
+//   function mousemove() {
+//     var x0 = x.invert(d3.mouse(this)[0]),
+//         i = bisectDate(data, x0, 1),
+//         d0 = data[i - 1],
+//         d1 = data[i],
+//         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+//     focus.attr("transform", "translate(" + x(d.date) + "," + y(d.close) + ")");
+//     focus.select("text").text(d);
+//   }
+svg.selectAll(".dot25")
+    .data(data)
+  .exit().remove();
+
+svg.selectAll(".dot10")
+    .data(data)
+  .enter().append("circle") // Uses the enter().append() method
+    .attr("class", "dot10") // Assign a class for styling
+    .attr("cx", function(d) { return xScale(d.date) })
+    .attr("cy", function(d) { return yScale(d.pm10) })
+    .attr("r", 5)
+      .on("mouseover", function(a, b, c) { 
+  			console.log(a) 
+        // this.attr('class', 'focus')
+		})
+      .on("mouseout", function() {  })
+
+svg.selectAll(".dot10")
+    .data(data)
+  .exit().remove();
+
+
+});
+
+ 
+
+
+setInterval(loadData,10000);
+
+};
+
+window.addEventListener("resize", function(){
+      loadData();
+    });
+
+loadData();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+ [Unit]
+ Description=Air Quality - Sensor Service
+ After=multi-user.target
+
+ [Service]
+ Type=idle
+ ExecStart=/usr/bin/python2 /home/pi/aqi-pi/python/aqi.py
+
+ [Install]
+ WantedBy=multi-user.target

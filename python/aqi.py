@@ -217,7 +217,13 @@ if __name__ == '__main__':
             cmd_set_sleep()
            
             time.sleep(sleep_sec)
+<<<<<<< HEAD
 
         except KeyboardInterrupt:
             loop_forever = False
             pass
+=======
+    except KeyboardInterrupt:
+        pass
+
+>>>>>>> b3b5c46be55750ad24e592330f815972a3d9f891
