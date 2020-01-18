@@ -69,10 +69,11 @@ cd aqi-pi
 * Copy the contents of the html directory into /var/www/html and install some python2 packages and a lightweight HTTP server
 ```
 sudo apt install lighttpd python-serial python-enum
-pip install py-sds011
+sudo pip3 install py-sds011 python-dateutil
 sudo cp ./html/* /var/www/html
 ```
 TODO setup requirements.txt to automatically collect python prerequisites
+TODO run everything without sudo
 
 ## OLED Display Setup
 
@@ -128,9 +129,9 @@ You should see something like:
 Captures data from the SDS011 sensor and writes it to the JSON file (/var/www/html/aqi.json) used by the consuming scripts.
 On the raspberry pi from the local copy of the git repo, run: 
 ```
-sudo python2 ./python/aqi.py
+sudo python3 ./python/aqi.py
 ```
-*NB awi.py is currently written for python2 and is incompatible with python3*
+TODO run everything without sudo
 
 ### Run the Display: 
 Displays the latest measurement from the sensor on the screen.
