@@ -57,8 +57,15 @@ Not Working and on the TODO list:
 * Depending on your raspbian image you may need to install git and other tools (python 3) first
 ```
 sudo apt update
-sudo apt install git python3-pip
+sudo apt upgrade
+sudo apt install git python3 python3-pip
+sudo usermod -a -G tty pi
+sudo usermod -a -G dialout pi
+sudo chmod 777 /var/www/html
 ```
+TODO more elegant chmod for html
+
+* Reboot (logout/login) for permissions to take effect
 * Clone this (or a forked copy) of this repo to your pi: 
 ```
 git clone https://github.com/ugoogalizer/aqi-pi.git
@@ -69,11 +76,10 @@ cd aqi-pi
 * Copy the contents of the html directory into /var/www/html and install some python2 packages and a lightweight HTTP server
 ```
 sudo apt install lighttpd python-serial python-enum
-sudo pip3 install py-sds011 python-dateutil
+pip3 install py-sds011 python-dateutil
 sudo cp ./html/* /var/www/html
 ```
 TODO setup requirements.txt to automatically collect python prerequisites
-TODO run everything without sudo
 
 ## OLED Display Setup
 
@@ -129,9 +135,8 @@ You should see something like:
 Captures data from the SDS011 sensor and writes it to the JSON file (/var/www/html/aqi.json) used by the consuming scripts.
 On the raspberry pi from the local copy of the git repo, run: 
 ```
-sudo python3 ./python/aqi.py
+python3 ./python/aqi.py
 ```
-TODO run everything without sudo
 
 ### Run the Display: 
 Displays the latest measurement from the sensor on the screen.
@@ -139,6 +144,8 @@ On the raspberry pi from the local copy of the git repo, run:
 ```
 sudo python3 ./python/display.py
 ```
+TODO - check i2c permissions with raspi-config to avoid using sudo here
+
 CTRL+C quits the display (and now turns off the display rather than leaves it to run and burn out your screen)
 
 ### Run the RESTful Interface
