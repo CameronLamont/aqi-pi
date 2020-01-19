@@ -44,56 +44,81 @@ import json
  
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
- 
 
-def on_created(event):
-    print(f"hey, {event.src_path} has been created!")
-    redraw()
+from datetime import datetime
 
-def on_deleted(event):
-    print(f"what the f**k! Someone deleted {event.src_path}!")
-
-def on_modified(event):
-    print(f"hey buddy, {event.src_path} has been modified")
-    redraw()
-
-def on_moved(event):
-    print(f"ok ok ok, someone moved {event.src_path} to {event.dest_path}")
 
 def redraw():
-    # Draw a black filled box to clear the image.
-    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    global text_size
+    global display_text
+    global text_x
+    global text_y
 
+    # Draw a black filled box to clear the image.
+    draw.rectangle((0, 0, max(width,text_size[0]), height), outline=0, fill=0)
+
+    draw.text((text_x,text_y),display_text,font=font32,fill=255)
+
+    # Display image.
+    disp.image(image)
+    disp.show()
+
+def read_data():
+    global text_size
+    global display_text
+    global text_x
+    global text_y
+
+    # if True:
     try:
         #Proper way to extract from json file by reading json structure
         with open("/var/www/html/aqi.json", "r") as read_file:
             measurementdata = json.load(read_file)
             measurement = measurementdata[-1]
             #print(measurement)
-            aqipm10 = "PM10: " + str(measurement['pm10'])
-            aqipm25 = "PM2.5: " + str(measurement['pm25'])
-            aqiDateTime = str(measurement['time'])
+            aqipm10 = "pm10:" + str(measurement['pm10'])
+            aqipm25 = "pm2.5:" + str(measurement['pm25'])
+            aqiDateTime = datetime.fromisoformat(measurement['time'])
 
-        aqiHeader = "Air Quality Sensor"
+        #aqiHeader = "Air Quality Sensor"
 
-        print(aqiHeader)
+        #print(aqiHeader)
         print(aqiDateTime)
         print(aqipm25)
         print(aqipm10)
 
         # Write four lines of text.
-        draw.text((x, top+0), aqiHeader, font=font, fill=255)
-        draw.text((x, top+8), aqiDateTime, font=font, fill=255)
-        draw.text((x, top+16), aqipm25, font=font, fill=255)
-        draw.text((x, top+25), aqipm10, font=font, fill=255)
+        #draw.text((x, top+0), aqiHeader, font=font, fill=255)
+#        draw.text((x, top+0), aqiDateTime, font=font10, fill=255)
+ #       draw.text((x, top+10), aqipm25+" "+aqipm10, font=font16, fill=255)
 
-        # Display image.
-        disp.image(image)
-        disp.show()
-        
-    except:
-        e = sys.exc_info()[0]
-        print("Exception %s" % e)
+        display_text=aqipm25+" "+aqipm10+" "+aqiDateTime.strftime("%d%b%Y %H:%M:%S")
+        text_size = font32.getsize(display_text)
+        text_x = x
+        text_y = top+0
+
+    except json.decoder.JSONDecodeError:
+        print("JSON parse failed")
+        pass
+    # except:
+        # e = sys.exc_info()[0]
+        # print("Exception %s" % e)
+
+def on_created(event):
+    #print(f"{event.src_path} has been created!")
+    read_data()
+    # redraw()
+
+def on_deleted(event):
+    print(f"deleted {event.src_path}!")
+
+def on_modified(event):
+    #print(f"{event.src_path} has been modified")
+    read_data()
+    #redraw()
+
+def on_moved(event):
+    print(f"moved {event.src_path} to {event.dest_path}")
 
 if __name__ == "__main__":
 
@@ -146,7 +171,8 @@ if __name__ == "__main__":
     # Move left to right keeping track of the current x position for drawing shapes.
     x = 0
     
-    
+    font_size=10
+
     # Load default font.
     # font = ImageFont.load_default()
     
@@ -154,7 +180,18 @@ if __name__ == "__main__":
     # same directory as the python script!
     # Some other nice fonts to try: http://www.dafont.com/bitmap.php
     #font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 9)
-    font = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 12)
+    font10 = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 10)
+    font16 = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 16)
+    font32 = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 32)
+
+
+    #  variable to hold current width of text in pixels
+    display_text = "Air Quality Sensor"
+    text_size = font32.getsize(display_text) #(128, 32)
+    text_x = x
+    text_y = top+0
+
+    scroll_px = 5
 
     #function to clear the screen on exit
     def disableDisplay():
@@ -162,12 +199,40 @@ if __name__ == "__main__":
     atexit.register(disableDisplay)
 
     # draw file content up front
+    read_data()
     redraw()
     my_observer.start()
+    
     try:
         while True:
-            #print("waiting for something to happen")
-            time.sleep(1)
+
+            if text_size[0] > 128:
+                time.sleep(2)
+                print("scrolling left")
+                while text_x > x - (text_size[0]-128):
+                # for i in range(128,text_size[0]),-scroll_px:
+                    text_x -= scroll_px
+                    redraw()
+                    # disp.scroll(-6,0)
+                    # disp.show()
+                    time.sleep(0.01)
+                    # print(text_x)
+
+                time.sleep(2)
+                print("scrolling right")
+                # for i in range(128,text_size[0],scroll_px):
+                while text_x < x:
+                    text_x += scroll_px
+                    redraw()
+                    # disp.scroll(6,0)
+                    # disp.show()
+                    time.sleep(0.01)
+                    # print(text_x)
+                
+
+            time.sleep(0.01)
     except KeyboardInterrupt:
         my_observer.stop()
         my_observer.join()
+    finally:
+        disableDisplay()
